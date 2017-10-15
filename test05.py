@@ -20,6 +20,9 @@ def initial_bagh_setup():
             turtle.setpos(x,y)
             t = turtle.stamp()
             tiger_ids.append(t)
+    turtle.shape("turtle")
+    for i in tiger_ids:
+        turtle.clearstamp(i)
             #turtle = Turtle('tiger.gif')
 screen.onscreenclick(onclick_handler)
 X = -200
