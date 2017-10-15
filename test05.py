@@ -2,9 +2,6 @@ from turtle import Turtle, Screen
 #screen = Screen()
 turtle = Turtle()
 screen = turtle.getscreen()
-convas = screen.getcanvas()
-#X = screen.window_width()
-#Y = screen.window_height()
 screen.bgpic("board.png")
 
 def onclick_handler(x, y):
@@ -13,14 +10,16 @@ def onclick_handler(x, y):
 def initial_bagh_setup():
     keys = pos_list.keys()
     print(screen.getshapes())
+    tiger = "tiger.gif"
+    tiger_ids = []
+    screen.register_shape(tiger)
+    turtle.shape(tiger)
     for key in keys:
-        if (key == 0 or key == 4 or key == 19 or key == 24):
-            [x, y] = pos_list[key]
-            tiger = "tiger.gif"
-            screen.register_shape(tiger)
+        if (key == 0 or key == 4 or key == 20 or key == 24):
+            [x, y] = pos_list[key] 
             turtle.setpos(x,y)
-            #screen.addshape(tiger)
-            turtle.shape(tiger)
+            t = turtle.stamp()
+            tiger_ids.append(t)
             #turtle = Turtle('tiger.gif')
 screen.onscreenclick(onclick_handler)
 X = -200
