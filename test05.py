@@ -7,12 +7,13 @@ screen.tracer(1,1)
 filled_pos = [False] * 25
 tiger = "tiger.gif"
 goat = "goat.gif"
+screen.register_shape(tiger)
+screen.register_shape(goat)
 
 def initial_bagh_setup():
     keys = pos_list.keys()
     print(screen.getshapes())
     tiger_ids = []
-    screen.register_shape(tiger)
     turtle.shape(tiger)
     for key in keys:
         if (key == 0 or key == 4 or key == 20 or key == 24):
@@ -77,7 +78,7 @@ def enter():
     turtle.color("green")
     global pos, floating_pos
     floating_pos = pos
-    turtle.shape(tiger)
+    turtle.shape(goat)
     turtle.stamp()
     print("hh")
 #listen events
