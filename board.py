@@ -103,6 +103,8 @@ class Board(turtle.Turtle):
             [x,y,t,i] = self.pos_list[self.current_step]
             if(t == PLAYERS.GOAT):
                 self.clearstamp(i)
+                [x,y,_,_] = self.pos_list[self.current_step]
+                self.pos_list[x,y,PLAYERS.EMPTY,0]
                 self.shape(self.goatStamp)
                 self.floating_pos = self.current_step
                 self.game_state = states.MOVE_GOAT
@@ -117,6 +119,8 @@ class Board(turtle.Turtle):
             [x,y,t,i] = self.pos_list[self.current_step]
             if(t == PLAYERS.TIGER):
                 self.clearstamp(i)
+                [x,y,_,_] = self.pos_list[self.current_step]
+                self.pos_list[self.current_step] = [x,y,PLAYERS.EMPTY,0]
                 self.shape(self.tigerStamp)
                 self.floating_pos = self.current_step
                 self.game_state = states.MOVE_TIGER
