@@ -130,7 +130,7 @@ class Board(turtle.Turtle):
                 s_id = self.stamp()
                 self.pos_list[self.current_step] = [x,y,PLAYERS.TIGER, s_id]
                 self.shape("turtle")
-                if(self.no_goats >= 20):
+                if(self.no_goats >= 19):
                     self.game_state = states.SELECT_GOAT
                 else:
                     self.game_state = states.ADD_GOAT
