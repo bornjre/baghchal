@@ -3,14 +3,14 @@ from turtle import Turtle, Screen
 turtle = Turtle()
 screen = turtle.getscreen()
 screen.bgpic("board.png")
-
-def onclick_handler(x, y):
-    print(x,y)
+screen.tracer(1,1)
+filled_pos = [False] * 25
+tiger = "tiger.gif"
+goat = "goat.gif"
 
 def initial_bagh_setup():
     keys = pos_list.keys()
     print(screen.getshapes())
-    tiger = "tiger.gif"
     tiger_ids = []
     screen.register_shape(tiger)
     turtle.shape(tiger)
@@ -20,11 +20,11 @@ def initial_bagh_setup():
             turtle.setpos(x,y)
             t = turtle.stamp()
             tiger_ids.append(t)
+            filled_pos[key] = True
     turtle.shape("turtle")
-    for i in tiger_ids:
-        turtle.clearstamp(i)
-            #turtle = Turtle('tiger.gif')
-screen.onscreenclick(onclick_handler)
+    # for i in tiger_ids:
+    #     turtle.clearstamp(i)
+
 X = -200
 Y = 200
 pos_list = {}
@@ -34,18 +34,59 @@ turtle.color("red")
 turtle.penup()
 for i in range(5):
     for j in range(5):
-        #turtle.tracer(0, 0)
         turtle.setpos(next_x, next_y)
         turtle.pendown()
-        #turtle.circle(5)
         turtle.penup()
         key = 5 * i + j
         pos_list[key] = [next_x, next_y] 
         next_x = next_x + 100
     next_x = X
     next_y = next_y - 100
-print(pos_list)
 initial_bagh_setup()
-turtle.speed(10)
+pos = 12
+floating_pos = None
+[x, y] = pos_list[pos]
+turtle.setpos(x,y)
+
+#events functions
+def forward():
+    global pos
+    if(pos > 4):
+        pos = pos - 5
+        [x, y] = pos_list[pos]
+        turtle.setpos(x,y)
+def backward():
+    global pos
+    if(pos < 20):
+        pos = pos + 5
+        [x, y] = pos_list[pos]
+        turtle.setpos(x,y)
+def left():
+    global pos
+    if((pos > 0) or (pos < 24)):
+        pos = pos - 1
+        [x, y] = pos_list[pos]
+        turtle.setpos(x,y)
+def right():
+    global pos
+    if((pos > 0) or (pos < 24)):
+        pos = pos + 1
+        [x, y] = pos_list[pos]
+        turtle.setpos(x,y)
+def enter():
+    turtle.color("green")
+    global pos, floating_pos
+    floating_pos = pos
+    turtle.shape(tiger)
+    turtle.stamp()
+    print("hh")
+#listen events
+screen.onkey(forward, "Up")
+screen.onkey(backward, "Down")
+screen.onkey(left, "Left")
+screen.onkey(right, "Right")
+screen.onkey(enter, "Return")
+screen.listen()
+
 
 screen.mainloop()
