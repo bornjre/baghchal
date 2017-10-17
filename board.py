@@ -1,6 +1,6 @@
 import turtle
 from enum import Enum
-
+from graph import Graph
 
 class states(Enum):
     ADD_GOAT = 1
@@ -8,12 +8,11 @@ class states(Enum):
     MOVE_GOAT = 3
     SELECT_TIGER = 4
     MOVE_TIGER = 5
-PLAYERS = Enum('t', 'EMPTY TIGER GOAT')
-
+PLAYERS = Enum('TYPES', 'EMPTY TIGER GOAT')
 
 class Board(turtle.Turtle):
     def __init__(self):
-        self.filled_pos = [0] * 25
+        #self.filled_pos = [0] * 25
         self.pos_list = {}
         self.tigerStamp = "tiger.gif"
         self.goatStamp = "goat.gif"
@@ -21,10 +20,9 @@ class Board(turtle.Turtle):
         self.X = -200
         self.Y = 200
         self.current_step = 12
+        self.died_goat = 0
         self.floating_pos = None
         self.game_state = states.ADD_GOAT
-        self.next_x = self.X
-        self.next_y = self.Y
         super().__init__()
         self.myscreen = self.getscreen()
         self.myscreen.tracer(1,1)
@@ -33,16 +31,20 @@ class Board(turtle.Turtle):
         self.penup()
         self.color("red")
         self.penup()
+        next_x = self.X
+        next_y = self.Y
         for i in range(5):
             for j in range(5):
-                self.setpos(self.next_x, self.next_y)
+                self.setpos(next_x, next_y)
                 key = 5 * i + j
-                self.pos_list[key] = [self.next_x, self.next_y, PLAYERS.EMPTY, 0] 
-                self.next_x = self.next_x + 100
-            self.next_x = self.X
-            self.next_y = self.next_y - 100
+                self.pos_list[key] = [next_x, next_y, PLAYERS.EMPTY, 0] 
+                next_x = next_x + 100
+            next_x = self.X
+            next_y = next_y - 100
             self.myscreen.register_shape(self.tigerStamp)
             self.myscreen.register_shape(self.goatStamp)
+
+
     def initial_bagh_setup(self):
         keys = self.pos_list.keys()
         tiger_ids = []
@@ -53,10 +55,12 @@ class Board(turtle.Turtle):
                 self.setpos(x,y)
                 s_id = self.stamp()
                 self.pos_list[key] = [x,y,PLAYERS.TIGER, s_id]
-                self.filled_pos[key] = True
+                #self.filled_pos[key] = True
         self.shape("turtle")
         [x, y, _, _] = self.pos_list[self.current_step]
         self.setpos(x,y)
+
+    #listen for events
     def setup_key_events(self):
         self.myscreen.onkey(self.move_up, "Up")
         self.myscreen.onkey(self.move_down, "Down")
@@ -72,23 +76,32 @@ class Board(turtle.Turtle):
             self.current_step = self.current_step - 5
             [x, y, _, _] = self.pos_list[self.current_step]
             self.setpos(x,y)
+
+
     def move_down(self):
         if(self.current_step < 19):
             self.current_step = self.current_step + 5
             [x, y, _, _] = self.pos_list[self.current_step]
             self.setpos(x,y)
+
+
     def move_left(self):
         if((self.current_step > 0)):
             self.current_step = self.current_step - 1
             [x, y,_,_] = self.pos_list[self.current_step]
             self.setpos(x,y)
+
+
     def move_right(self):
         if( (self.current_step < 24)):
             #print("DEBUG:2")
             self.current_step = self.current_step + 1
             [x, y,_,_] = self.pos_list[self.current_step]
             self.setpos(x,y)
+
+
     def pressed_enter(self):
+        #FSM like logic of baghchal (could be implemented as state pattern)
         #print("DEBUG:3", states.ADD_GOAT)
         if(self.game_state==states.ADD_GOAT):
             [x,y,t,_] = self.pos_list[self.current_step]
@@ -99,6 +112,7 @@ class Board(turtle.Turtle):
                 self.shape("turtle")
                 self.game_state = states.SELECT_TIGER
                 self.no_goats =+1
+
         elif(self.game_state == states.SELECT_GOAT):
             [x,y,t,i] = self.pos_list[self.current_step]
             if(t == PLAYERS.GOAT):
@@ -108,13 +122,15 @@ class Board(turtle.Turtle):
                 self.shape(self.goatStamp)
                 self.floating_pos = self.current_step
                 self.game_state = states.MOVE_GOAT
+
         elif(self.game_state == states.MOVE_GOAT):
             [x,y,t,_] = self.pos_list[self.current_step]
-            if(t == PLAYERS.EMPTY):
+            if(t == PLAYERS.EMPTY and Graph.is_walk_valid(self.current_step, self.floating_pos)):
                 s_id = self.stamp()
                 self.pos_list[self.current_step] = [x,y,PLAYERS.GOAT, s_id]
                 self.shape("turtle")
                 self.game_state = states.SELECT_TIGER
+
         elif(self.game_state == states.SELECT_TIGER):
             [x,y,t,i] = self.pos_list[self.current_step]
             if(t == PLAYERS.TIGER):
@@ -124,16 +140,33 @@ class Board(turtle.Turtle):
                 self.shape(self.tigerStamp)
                 self.floating_pos = self.current_step
                 self.game_state = states.MOVE_TIGER
+
         elif(self.game_state == states.MOVE_TIGER):
             [x,y,t,_] = self.pos_list[self.current_step]
-            if(t == PLAYERS.EMPTY):
+            if (t != PLAYERS.EMPTY):
+                return
+            if(Graph.is_walk_valid(self.current_step, self.floating_pos) ):
                 s_id = self.stamp()
                 self.pos_list[self.current_step] = [x,y,PLAYERS.TIGER, s_id]
                 self.shape("turtle")
-                if(self.no_goats >= 19):
-                    self.game_state = states.SELECT_GOAT
-                else:
-                    self.game_state = states.ADD_GOAT
+            else:
+                jump, g_pos = Graph.is_jump_valid(self.current_step, self.floating_pos )
+                if(jump and g_pos is not None):
+                    [_,_,gt,i] = self.pos_list[g_pos]
+                    if(gt == PLAYERS.GOAT):
+                        self.clearstamp(i)#killing goat
+                        self.died_goat = self.died_goat + 1
+                        s_id = self.stamp()
+                        self.pos_list[self.current_step] = [x,y,PLAYERS.TIGER, s_id]
+                        self.shape("turtle")
+                        if(self.died_goat>4):
+                            print("game over")
+            if(self.no_goats >= 19):
+                self.game_state = states.SELECT_GOAT
+            else:
+                self.game_state = states.ADD_GOAT
+
+
 def main():
     board = Board()
     board.initial_bagh_setup()
