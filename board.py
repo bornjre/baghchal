@@ -19,14 +19,14 @@ class Board(turtle.Turtle):
         self.no_goats = 0
         self.X = -200
         self.Y = 200
-        self.current_step = 12
+        self.current_step = 12 #cuz leave cursor in middle of board
         self.died_goat = 0
         self.floating_pos = None
         self.game_state = states.ADD_GOAT
         super().__init__()
         self.myscreen = self.getscreen()
         self.myscreen.tracer(1,1)
-        self.myscreen.bgpic("board.png")
+        self.myscreen.bgpic("board.png") #400*400 px
         self.shape("turtle")
         self.penup()
         self.color("red")
@@ -147,24 +147,32 @@ class Board(turtle.Turtle):
                 return
             if(Graph.is_walk_valid(self.current_step, self.floating_pos) ):
                 s_id = self.stamp()
+                print("i did it 1")
                 self.pos_list[self.current_step] = [x,y,PLAYERS.TIGER, s_id]
                 self.shape("turtle")
             else:
                 jump, g_pos = Graph.is_jump_valid(self.current_step, self.floating_pos )
-                if(jump and g_pos is not None):
-                    [_,_,gt,i] = self.pos_list[g_pos]
-                    if(gt == PLAYERS.GOAT):
-                        self.clearstamp(i)#killing goat
-                        self.died_goat = self.died_goat + 1
-                        s_id = self.stamp()
-                        self.pos_list[self.current_step] = [x,y,PLAYERS.TIGER, s_id]
-                        self.shape("turtle")
-                        if(self.died_goat>4):
-                            print("game over")
+                if(not jump and g_pos is  None):
+                    return
+                [xg,yg,gt,i] = self.pos_list[g_pos]
+                if(gt == PLAYERS.GOAT):
+                    self.clearstamp(i)#killing goat
+                    self.pos_list[g_pos] = [xg,yg,PLAYERS.EMPTY,i]
+                    self.died_goat = self.died_goat + 1
+                    print("no i did it 2")
+                    s_id = self.stamp()
+                    self.pos_list[self.current_step] = [x,y,PLAYERS.TIGER, s_id]
+                    self.shape("turtle")
+                    if(self.died_goat>4):
+                        print("game over")
             if(self.no_goats >= 19):
                 self.game_state = states.SELECT_GOAT
             else:
                 self.game_state = states.ADD_GOAT
+    def show_msg(self):
+        temp_pos = self.pos()
+        self.setpos(250, 250)
+
 
 
 def main():
