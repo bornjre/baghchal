@@ -79,7 +79,7 @@ class Board(turtle.Turtle):
 
 
     def move_down(self):
-        if(self.current_step < 19):
+        if(self.current_step < 20):
             self.current_step = self.current_step + 5
             [x, y, _, _] = self.pos_list[self.current_step]
             self.setpos(x,y)
