@@ -9,6 +9,7 @@ class states(Enum):
     SELECT_TIGER = 4
     MOVE_TIGER = 5
 PLAYERS = Enum('TYPES', 'EMPTY TIGER GOAT')
+# umanga was here
 
 class Board(turtle.Turtle):
     def __init__(self):
