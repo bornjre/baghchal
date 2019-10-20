@@ -7,7 +7,8 @@ class states(Enum):
     SELECT_GOAT = 2
     MOVE_GOAT = 3
     SELECT_TIGER = 4
-    MOVE_TIGER = 5
+    MOVE_TIGER = 6
+    # bagh and gaot
 PLAYERS = Enum('TYPES', 'EMPTY TIGER GOAT')
 
 class Board(turtle.Turtle):
